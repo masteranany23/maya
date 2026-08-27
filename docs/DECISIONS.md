@@ -24,3 +24,33 @@ Reason: working, episodic, semantic, profile, and reflective memories serve diff
 Status: Accepted
 
 Reason: voice introduces streaming, latency, interruption, TTS/STT provider, and prosody complexity. Build the cognitive loop first so audio becomes an adapter.
+
+## ADR-0006 — Multi-channel recall replaces single-method search
+Status: Accepted
+
+Reason: the original `MemoryStore.search()` used keyword overlap as the sole retrieval mechanism. The architecture promises scoring, ranking, and multiple memory tiers, which cannot be served by a single search method. We separate persistence (`MemoryWriter`/`MemoryReader`/`LinkStore`) from retrieval (`RecallChannel`/`RecallEngine`). Each recall channel implements one strategy (keyword, temporal, entity, topic, emotional, associative, importance). A `MultiChannelRecallEngine` fuses their results.
+
+## ADR-0007 — Rich memory model with emotional/temporal/associative context
+Status: Accepted
+
+Reason: the flat `MemoryItem` text blob cannot support multi-dimensional retrieval. We extend it with `EmotionalContext`, `TemporalContext`, `ProvenanceRecord`, `ScoringState`, `MemoryStatus` lifecycle, extracted entities, topics, and an association graph via `MemoryLink`.
+
+## ADR-0008 — Explicit memory lifecycle states
+Status: Accepted
+
+Reason: memories need lifecycle management. `MemoryStatus` enum (ACTIVE, DECAYED, CONSOLIDATED, CONTRADICTED, ARCHIVED) enables soft deletion, audit trails, and explicit state transitions. All queries default to ACTIVE. No destructive deletion.
+
+## ADR-0009 — Storage-retrieval separation
+Status: Accepted
+
+Reason: coupling persistence and retrieval into one `MemoryStore` protocol prevents independent evolution. Storage backends (in-memory, SQLite, future Postgres) implement `MemoryWriter`/`MemoryReader`. Recall channels are composable strategies that operate on candidate lists, independent of storage format.
+
+## ADR-0010 — No vector database until structured retrieval is proven
+Status: Accepted
+
+Reason: vector similarity search introduces infrastructure complexity and makes retrieval opaque. All initial recall channels use structured data (keyword, entity, topic, temporal, emotional, graph links). Vector embeddings will be added as an additional `RecallChannel` later, not as the sole retrieval mechanism.
+
+## ADR-0011 — Multi-channel Cueing + Spreading Activation
+Status: Accepted
+
+Reason: Simple 1-hop associative recall is insufficient for complex memory traversal. We adopted a 5-stage pipeline (Candidate Generation -> Cueing -> Spreading Activation -> Ranking -> Reconstruction) inspired by HeLa-Mem and SYNAPSE. Cueing channels generate seed activations, which are propagated through the `MemoryLink` graph using best-first search. To prevent highly-connected generic memories from flooding the network (false memories), we apply degree-normalized inhibition.

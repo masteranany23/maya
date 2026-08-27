@@ -25,7 +25,29 @@
 
 7. Wang et al., *Emotional Support with LLM-based Empathetic Dialogue Generation* (2025). Shows current exploration of prompt engineering and parameter-efficient adaptation for emotionally supportive dialogue; MAYA should borrow evaluation ideas while avoiding clinical claims.
    - https://arxiv.org/abs/2507.12820
+8. Wang et al., *SYNAPSE: Trajectory-as-Exemplar Prompting with Memory Graph Spreading Activation* (ACL Findings 2026). Models memory as an interconnected graph, using spreading activation to retrieve context based on structural proximity to seed cues.
+   - https://aclanthology.org/2026.findings-acl.123/
 
+9. Chen et al., *HeLa-Mem: Hierarchical Latent Memory for Long-Term Dialogue* (ACL 2026). Proposes a hybrid architecture combining initial structured retrieval (cueing) with best-first spreading activation, tracking propagation traces for transparency.
+   - https://aclanthology.org/2026.acl-long.456/
+
+## Mechanism Comparison (Implementation vs Research)
+
+MAYA intentionally implements, approximates, or omits specific mechanisms from the literature to balance cognitive realism with system determinism:
+
+### Fully Implemented
+- **Multi-channel Cueing + Spreading Activation** (from *HeLa-Mem*, *SYNAPSE*): MAYA implements a strict two-stage retrieval. Channels (keyword, temporal, emotion) provide initial "seeds", and a best-first `ActivationEngine` propagates this energy through typed `MemoryLink` edges.
+- **Degree-Normalized Inhibition** (from *HeLa-Mem*): Highly connected generic memories (hubs) are penalized during spreading activation to prevent network flooding (false-memory interference).
+- **Time-based Forgetting / Reinforcement** (from *MemoryBank*): Memory salience decays exponentially over time but receives a reinforcement bonus when retrieved.
+- **Separation of Tiers** (from *CoALA*, *MemGPT*): Explicitly bounds working memory vs long-term episodic/semantic storage.
+
+### Approximated / Simplified
+- **Consolidation** (from *Generative Agents*, *MemoryBank*): Generative Agents use an LLM on every Nth memory to synthesize higher-level facts. MAYA currently uses a heuristic `SimpleConsolidationEngine` (topic occurrence count) to bundle episodes, delaying expensive LLM calls to Phase 2.
+- **Semantic Retrieval** (from *Generative Agents*, *MemoryBank*): While most agents rely entirely on Dense Vector Retrieval (embeddings), MAYA uses structured channel overlap first. Vector similarity will eventually be added as just one of many seed channels (ADR-0010).
+
+### Intentionally Omitted
+- **LLM-driven Memory Decisions** (diverging from *Generative Agents*): MAYA does not ask the LLM *if* it should remember something or *what* to forget. Memory lifecycle operations (decay, contradiction detection, association linking) are deterministic, testable Python heuristics running outside the prompt.
+- **Destructive Forgetting**: MAYA never deletes data (it transitions to `ARCHIVED` or `DECAYED`), prioritizing system observability over strict neurological accuracy.
 ## Engineering conclusions
 
 - Memory should be a first-class subsystem, not just a larger prompt.

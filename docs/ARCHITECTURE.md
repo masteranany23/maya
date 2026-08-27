@@ -64,15 +64,31 @@ Stable domain types, interfaces, dependency injection, clocks, IDs, errors.
 Orchestrates a single turn. It must not know how a specific model vendor works.
 
 ### `memory`
-Owns memory creation, scoring, retrieval, consolidation, decay/forgetting, and persistence.
+Owns memory creation, scoring, multi-channel retrieval, lifecycle management, consolidation, decay/forgetting, and persistence.
 
 Memory tiers:
 
-1. Working memory — current turn and small active context.
-2. Episodic memory — events and experiences.
-3. Semantic memory — stable knowledge synthesized from repeated evidence.
-4. Profile memory — user preferences/facts that are useful for personalization.
-5. Reflective memory — higher-level patterns or conclusions, always marked as derived.
+1. Working memory — bounded active context for the current conversation turn.
+2. Episodic memory — events and experiences with temporal bounds, emotional context, and participant tracking.
+3. Semantic memory — stable knowledge synthesized from repeated episodic evidence, with provenance chains.
+4. Profile memory — user preferences/facts useful for personalization.
+5. Reflective memory — higher-level patterns or conclusions derived from episodic/semantic memories, always marked as derived.
+
+Retrieval architecture follows a strict 5-stage cognitive pipeline:
+
+1. **Candidate Generation**: Fetching eligible memories from storage.
+2. **Cueing (Seed Activation)**: Channels (keyword, temporal, entity, topic, emotional) independently score candidates to generate initial seed activations. (Vector retrieval is one possible channel here).
+3. **Spreading Activation**: An `ActivationEngine` propagates seed energy across the `MemoryLink` graph using best-first search, penalized by degree-normalized inhibition to prevent hubs from flooding the network.
+4. **Ranking**: Memories are scored based on the maximum of their seed score and propagated activation.
+5. **Reconstruction**: Selected memories are loaded into working memory with an `ActivationTrace` explaining their retrieval path.
+
+Memory lifecycle:
+
+Memories transition through states: ACTIVE → DECAYED / CONSOLIDATED / CONTRADICTED / ARCHIVED. Decay is continuous and time-based. Reinforcement occurs on retrieval. Consolidation merges repeated episodic evidence into semantic memories. Contradiction detection flags conflicting memories for resolution.
+
+Association graph:
+
+Memories are connected by typed, weighted links (temporal, causal, thematic, emotional, entity-based, contradiction, supersession, derivation). Associative retrieval walks this graph from anchor memories.
 
 ### `emotion`
 Estimates conversational affect signals and maintains MAYA's affective response state. This is a computational state model, not a claim of subjective emotion.
@@ -106,6 +122,11 @@ Future internal events:
 - `ResponseAccepted`
 - `MemoryCandidateCreated`
 - `ReflectionRequested`
+- `MemoryDecayed`
+- `MemoryReinforced`
+- `MemoryConsolidated`
+- `ContradictionDetected`
+- `ReflectionCompleted`
 
 ## 6. Research mapping
 
@@ -118,6 +139,7 @@ Future internal events:
 | Long-term evaluation | LoCoMo |
 | Multimodal affect signals | M3ED |
 | Empathetic response generation | Emotional Support / empathetic dialogue research |
+| Association graph + multi-channel recall | Human memory: spreading activation, context-dependent retrieval |
 
 ## 7. Important implementation rule
 
