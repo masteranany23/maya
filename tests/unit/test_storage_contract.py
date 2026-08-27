@@ -46,10 +46,20 @@ def _mem(user_id=None, **kw: object) -> MemoryItem:
 class TestWriterReaderContract:
     """Tests that apply to any MemoryWriter + MemoryReader pair."""
 
-    @pytest.fixture()
-    def stores(self):
-        storage: dict = {}
-        return InMemoryWriter(storage), InMemoryReader(storage)
+    @pytest.fixture(params=["in_memory", "sqlite"])
+    async def stores(self, request):
+        if request.param == "in_memory":
+            storage: dict = {}
+            yield InMemoryWriter(storage), InMemoryReader(storage)
+        else:
+            from maya.memory.store.sqlite import SQLiteReader, SQLiteWriter
+            db_path = f"file:{uuid4()}?mode=memory&cache=shared"
+            writer = SQLiteWriter(db_path)
+            reader = SQLiteReader(db_path)
+            await writer.init_schema()
+            yield writer, reader
+            await writer.close()
+            await reader.close()
 
     async def test_write_then_get(self, stores) -> None:
         writer, reader = stores
@@ -136,9 +146,17 @@ class TestWriterReaderContract:
 
 
 class TestLinkStoreContract:
-    @pytest.fixture()
-    def link_store(self):
-        return InMemoryLinkStore()
+    @pytest.fixture(params=["in_memory", "sqlite"])
+    async def link_store(self, request):
+        if request.param == "in_memory":
+            yield InMemoryLinkStore()
+        else:
+            from maya.memory.store.sqlite import SQLiteLinkStore
+            db_path = f"file:{uuid4()}?mode=memory&cache=shared"
+            store = SQLiteLinkStore(db_path)
+            await store.init_schema()
+            yield store
+            await store.close()
 
     async def test_add_and_get_outgoing(self, link_store) -> None:
         src, tgt = uuid4(), uuid4()

@@ -42,7 +42,7 @@ class TestMemoryType:
 class TestMemoryStatus:
     def test_all_statuses_present(self) -> None:
         assert set(MemoryStatus) == {
-            "active", "decayed", "consolidated", "contradicted", "archived",
+            "active", "weakened", "decayed", "consolidated", "superseded", "contradicted", "archived",
         }
 
 

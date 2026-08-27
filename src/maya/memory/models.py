@@ -40,8 +40,10 @@ class MemoryStatus(StrEnum):
     """Lifecycle state of a memory item."""
 
     ACTIVE = "active"
+    WEAKENED = "weakened"
     DECAYED = "decayed"
     CONSOLIDATED = "consolidated"
+    SUPERSEDED = "superseded"
     CONTRADICTED = "contradicted"
     ARCHIVED = "archived"
 

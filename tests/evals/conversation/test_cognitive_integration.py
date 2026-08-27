@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from typing import Any
 from uuid import UUID, uuid4
 
 import pytest
@@ -106,7 +107,7 @@ class TestCognitiveIntegration:
         await engine.memory_manager.memorize(m)
 
         # First chat triggers recall of pizza
-        resp = await engine.chat(user_id=user_id, conversation_id=conv_id, message="What do I love? pizza!")
+        _resp = await engine.chat(user_id=user_id, conversation_id=conv_id, message="What do I love? pizza!")
         
         # Check WorkingMemory
         wm = await engine.memory_manager.get_working_memory(user_id, conv_id)
@@ -123,7 +124,7 @@ class TestCognitiveIntegration:
         self, conversation_stack: tuple[ConversationEngine, dict, InMemoryLinkStore]
     ) -> None:
         """J8: False-memory resistance."""
-        engine, storage, _ = conversation_stack
+        engine, _storage, _ = conversation_stack
         user_id = uuid4()
         conv_id = uuid4()
 
@@ -138,7 +139,7 @@ class TestCognitiveIntegration:
         self, conversation_stack: tuple[ConversationEngine, dict, InMemoryLinkStore]
     ) -> None:
         """J7: Flagship autobiographical recall evaluation."""
-        engine, storage, link_store = conversation_stack
+        engine, _storage, link_store = conversation_stack
         user_id = uuid4()
         conv_id = uuid4()
 

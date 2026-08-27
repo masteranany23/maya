@@ -37,14 +37,15 @@ class DefaultMemoryManager:
         self._recall_engine = recall_engine
         self._working_memories: dict[tuple[UUID, UUID], WorkingMemory] = {}
 
-    async def remember(self, cue: RecallCue) -> list[RecallResult]:
+    async def remember(self, cue: RecallCue, is_background: bool = False) -> list[RecallResult]:
         """Recall memories matching the cue, then reinforce accessed ones."""
         results = await self._recall_engine.recall(cue)
 
         # Reinforce: bump access_count and last_accessed_at for recalled memories
-        now = _utc_now()
-        for r in results:
-            await self._reinforce_item(r.memory.id, now)
+        if not is_background:
+            now = _utc_now()
+            for r in results:
+                await self._reinforce_item(r.memory.id, now)
 
         return results
 
@@ -52,9 +53,10 @@ class DefaultMemoryManager:
         """Write a new memory item to storage."""
         return await self._writer.write(item)
 
-    async def reinforce(self, memory_id: UUID) -> None:
+    async def reinforce(self, memory_id: UUID, is_background: bool = False) -> None:
         """Manually reinforce a memory (e.g., when user references it)."""
-        await self._reinforce_item(memory_id, _utc_now())
+        if not is_background:
+            await self._reinforce_item(memory_id, _utc_now())
 
     async def get_working_memory(
         self, user_id: UUID, conversation_id: UUID

@@ -54,3 +54,13 @@ Reason: vector similarity search introduces infrastructure complexity and makes 
 Status: Accepted
 
 Reason: Simple 1-hop associative recall is insufficient for complex memory traversal. We adopted a 5-stage pipeline (Candidate Generation -> Cueing -> Spreading Activation -> Ranking -> Reconstruction) inspired by HeLa-Mem and SYNAPSE. Cueing channels generate seed activations, which are propagated through the `MemoryLink` graph using best-first search. To prevent highly-connected generic memories from flooding the network (false memories), we apply degree-normalized inhibition.
+
+## ADR-0012 — SQLite with JSON-encoded domains for Phase P2 Persistence
+Status: Accepted
+
+Reason: We needed a persistent database to advance beyond ephemeral testing. `sqlite3` (via `aiosqlite`) provides an embedded, transactional engine with zero operational overhead. Rather than creating highly normalized relational tables for complex domain contexts (ProvenanceRecord, TemporalContext, etc.), we map these sub-models directly to JSON strings within standard tables (`memory_items`, `memory_links`). This preserves the schema flexibility while enabling fast atomic writes.
+
+## ADR-0013 — Non-destructive Contradiction Resolution
+Status: Accepted
+
+Reason: Memory consolidation and conflict detection inherently face contradictions (e.g. "I love dogs" vs "I hate dogs"). To preserve auditable cognitive history, we never destructively delete memories. The `ContradictionResolutionPolicy` assigns lifecycle transitions based on the contradiction type: temporal changes supersede the old memory, unsupported inferences archive the new memory, and genuine contradictions weaken both while flagging for user clarification.
