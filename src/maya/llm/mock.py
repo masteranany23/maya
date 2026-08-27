@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import AsyncGenerator
 from typing import Any
 
 from maya.core.models import AffectState, Persona, ResponsePlan, UserProfile
@@ -39,3 +40,22 @@ class MockLLMProvider:
             return schema()
         except Exception:
             raise ValueError(f"No mock response configured for schema {schema.__name__}")
+
+    async def generate_stream(
+        self,
+        *,
+        persona: Persona,
+        profile: UserProfile,
+        recall_results: list[Any],
+        affect: AffectState,
+        plan: ResponsePlan,
+        user_message: str,
+    ) -> AsyncGenerator[str, None]:
+        if not recall_results:
+            yield "I have "
+            yield "no specific "
+            yield "memories about this."
+            return
+
+        yield f"Response based on {len(recall_results)} "
+        yield "memories."

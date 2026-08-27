@@ -35,13 +35,13 @@
 - contradiction handling;
 - LoCoMo-inspired local evaluation harness.
 
-## Phase 3 — Voice
+## Phase 3 — Voice (in progress)
 
-- STT abstraction;
-- TTS abstraction;
-- streaming turn protocol;
-- interruption/barge-in;
-- prosody/emotion controls.
+- [x] STT abstraction;
+- [x] TTS abstraction;
+- [x] streaming turn protocol;
+- [x] interruption/barge-in;
+- [x] prosody/emotion controls.
 
 ## Phase 4 — Multimodal companion
 

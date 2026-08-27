@@ -64,3 +64,8 @@ Reason: We needed a persistent database to advance beyond ephemeral testing. `sq
 Status: Accepted
 
 Reason: Memory consolidation and conflict detection inherently face contradictions (e.g. "I love dogs" vs "I hate dogs"). To preserve auditable cognitive history, we never destructively delete memories. The `ContradictionResolutionPolicy` assigns lifecycle transitions based on the contradiction type: temporal changes supersede the old memory, unsupported inferences archive the new memory, and genuine contradictions weaken both while flagging for user clarification.
+
+## ADR-0014 — Voice Architecture Separation of WHAT and HOW
+Status: Accepted
+
+Reason: Directly pipelining LLM token chunks to a TTS adapter leads to robotic, unstructured prosody. We decouple text generation from expressive synthesis using an intermediate `SpeechPlan` containing `ExpressiveSegment`s. A semantic buffering stage chunks tokens into phrases, a `SpeechPlanner` maps affect/intent to prosody, and a capability adapter strips unsupported features before reaching the `TTSProvider`. We also use a `VoiceSession` orchestrator to allow instant barge-in via VAD, bypassing the STT transcription latency.

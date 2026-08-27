@@ -60,3 +60,41 @@ async def health() -> dict[str, str]:
 async def chat(request: ChatRequest) -> ChatResponse:
     from uuid import uuid4
     return await _engine.chat(user_id=request.user_id, conversation_id=uuid4(), message=request.message)
+
+
+from fastapi import WebSocket, WebSocketDisconnect
+
+
+@app.websocket("/v1/voice/stream") # type: ignore
+async def voice_stream(websocket: WebSocket) -> None:
+    await websocket.accept()
+    from uuid import uuid4
+    user_id = uuid4()
+    
+    # We create a dummy VAD, STT, TTS for the session
+    from maya.voice.planner import SpeechPlanner
+    from maya.voice.providers.mock import MockSTTProvider, MockTTSProvider, MockVADProvider
+    from maya.voice.session import VoiceSession
+    
+    vad = MockVADProvider()
+    stt = MockSTTProvider()
+    tts = MockTTSProvider()
+    planner = SpeechPlanner()
+    
+    session = VoiceSession(
+        user_id=user_id,
+        engine=_engine,
+        vad=vad,
+        stt=stt,
+        tts=tts,
+        planner=planner,
+    )
+
+    # Note: real websocket processing requires a queue to feed the async generators
+    try:
+        while True:
+            data = await websocket.receive_bytes()
+            # In a full implementation, we'd pipe this into an async queue
+            # that process_user_audio consumes from.
+    except WebSocketDisconnect:
+        pass

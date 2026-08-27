@@ -44,6 +44,16 @@
 - [x] P2.4 Add contradiction/overwrite rules (detector implemented, resolution policies pending).
 - [x] P2.5 Add LoCoMo-style regression fixtures (8 evaluation fixtures implemented).
 
+### P3 — Voice Integration
+- [x] P3.1 Domain Models (ExpressiveSegment, SpeechPlan, TTSCapabilities, AudioChunk).
+- [x] P3.2 Protocols (VADProvider, STTProvider, TTSProvider).
+- [x] P3.3 Voice Core (SemanticBuffer, SpeechPlanner, VoiceSession).
+- [x] P3.4 Conversation Engine streaming and interruption updates.
+- [x] P3.5 Mock Providers (MockVAD, MockSTT, MockTTS).
+- [x] P3.6 WebSocket API endpoint for streaming.
+- [x] P3.7 Architecture Documentation (ADR-0014).
+- [ ] P3.8 Tests & Voice Evaluations.
+
 ## Definition of done
 
 Each task includes tests and documentation updates. The code remains runnable. Interfaces are dependency-injected. No secret or vendor-specific implementation leaks into domain code.

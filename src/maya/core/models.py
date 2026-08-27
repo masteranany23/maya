@@ -41,6 +41,7 @@ class ConversationTurn(BaseModel):
     user_id: UUID
     text: str
     created_at: datetime = Field(default_factory=utc_now)
+    interrupted: bool = False
 
 
 class ResponsePlan(BaseModel):

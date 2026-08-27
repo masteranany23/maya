@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import AsyncGenerator
 from typing import Any, Protocol
 
 from maya.core.models import (
@@ -40,4 +41,15 @@ class LLMProvider(Protocol):
         user_prompt: str,
         schema: type[Any], # Should be type[BaseModel]
     ) -> Any: ...
+
+    async def generate_stream(
+        self,
+        *,
+        persona: Persona,
+        profile: UserProfile,
+        recall_results: list[Any],
+        affect: AffectState,
+        plan: ResponsePlan,
+        user_message: str,
+    ) -> AsyncGenerator[str, None]: ...
 

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import asyncio
+from collections.abc import AsyncGenerator
 from uuid import UUID
 
 from maya.core.models import (
@@ -118,3 +120,101 @@ class ConversationEngine:
             affect=affect,
             used_memory_ids=[m.id for m in working_memory.active_memories],
         )
+
+    async def chat_stream(
+        self,
+        *,
+        user_id: UUID,
+        conversation_id: UUID,
+        text_stream: AsyncGenerator[str, None],
+        cancel_event: asyncio.Event,
+    ) -> AsyncGenerator[str, None]:
+        """Streaming equivalent of chat() for Voice pipelines."""
+        # 1. Accumulate text from user
+        full_message = ""
+        async for text_chunk in text_stream:
+            if cancel_event.is_set():
+                break
+            full_message += text_chunk
+            
+        if not full_message.strip():
+            return
+
+        turn = ConversationTurn(
+            user_id=user_id, 
+            text=full_message,
+            interrupted=cancel_event.is_set()
+        )
+
+        working_memory = await self.memory_manager.get_working_memory(user_id, conversation_id)
+        
+        # We only do the rest if not interrupted early by VAD
+        if turn.interrupted:
+            # Just memorize the interrupted turn
+            working_memory.recent_turns.append(turn)
+            if len(working_memory.recent_turns) > 10:
+                working_memory.recent_turns.pop(0)
+            encoded = await self.memory_encoder.encode(turn) if self.memory_encoder else None
+            if not encoded:
+                encoded = MemoryItem(
+                    user_id=user_id,
+                    memory_type=MemoryType.EPISODIC,
+                    content=full_message,
+                    provenance=ProvenanceRecord(source_type="user_message", method="direct_observation"),
+                )
+            await self.memory_manager.memorize(encoded)
+            return
+
+        working_memory.recent_turns.append(turn)
+        if len(working_memory.recent_turns) > 10:
+            working_memory.recent_turns.pop(0)
+
+        affect = await self.affect_analyzer.analyze(turn)
+        cue = RecallCue(user_id=user_id, text_query=full_message, limit=5)
+        recall_results = await self.memory_manager.remember(cue)
+        working_memory.recall_results = recall_results
+
+        plan = ResponsePlan(
+            intent="general_conversation",
+            stance="warm and context-sensitive",
+            goals=["answer the user", "avoid unsupported claims", "use relevant memory only"],
+            memory_ids=[m.id for m in working_memory.active_memories],
+        )
+
+        persona = await self.persona_store.get_persona()
+        profile = await self.persona_store.get_user_profile(str(user_id))
+
+        response_stream = self.llm.generate_stream(
+            persona=persona,
+            profile=profile,
+            recall_results=working_memory.recall_results,
+            affect=affect,
+            plan=plan,
+            user_message=full_message,
+        )
+
+        full_response = ""
+        async for chunk in response_stream:
+            if cancel_event.is_set():
+                # Barge-in during bot response!
+                break
+            full_response += chunk
+            yield chunk
+
+        # Memorize user's turn
+        encoded_experience = await self.memory_encoder.encode(turn) if self.memory_encoder else None
+        if not encoded_experience:
+            encoded_experience = MemoryItem(
+                user_id=user_id,
+                memory_type=MemoryType.EPISODIC,
+                content=full_message,
+                provenance=ProvenanceRecord(source_type="user_message", method="direct_observation"),
+            )
+        memorized_item = await self.memory_manager.memorize(encoded_experience)
+
+        if self.association_engine:
+            await self.association_engine.associate(
+                new_memory=memorized_item, 
+                context_memories=working_memory.active_memories
+            )
+
