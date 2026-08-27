@@ -69,3 +69,8 @@ Reason: Memory consolidation and conflict detection inherently face contradictio
 Status: Accepted
 
 Reason: Directly pipelining LLM token chunks to a TTS adapter leads to robotic, unstructured prosody. We decouple text generation from expressive synthesis using an intermediate `SpeechPlan` containing `ExpressiveSegment`s. A semantic buffering stage chunks tokens into phrases, a `SpeechPlanner` maps affect/intent to prosody, and a capability adapter strips unsupported features before reaching the `TTSProvider`. We also use a `VoiceSession` orchestrator to allow instant barge-in via VAD, bypassing the STT transcription latency.
+
+## ADR-0015 — Kokoro TTS Integration via kokoro-onnx
+Status: Accepted
+
+Reason: We require a fully local, CPU-compatible TTS provider optimized for an Intel i5 / 8GB RAM environment. The 82M parameter Kokoro model executed via ONNX (`kokoro-onnx`) uses <300MB RAM and achieves near real-time synthesis. Since it lacks deep expressive parameter controls (like explicit pitch shifting), we leverage the `TTSAdapterLayer` (ADR-0014) to degrade MAYA's rich `SpeechPlan` into Kokoro's supported features (rate control). Models are explicitly excluded from version control and downloaded securely out-of-band.

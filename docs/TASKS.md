@@ -52,7 +52,14 @@
 - [x] P3.5 Mock Providers (MockVAD, MockSTT, MockTTS).
 - [x] P3.6 WebSocket API endpoint for streaming.
 - [x] P3.7 Architecture Documentation (ADR-0014).
-- [ ] P3.8 Tests & Voice Evaluations.
+- [x] P3.8 Tests & Voice Evaluations.
+
+### P3.2 — Real TTS Integration (Kokoro)
+- [x] P3.2.1 Setup Dependencies (`kokoro-onnx`).
+- [x] P3.2.2 Provider Implementation (`KokoroTTSProvider`).
+- [x] P3.2.3 Provider-independent Unit Tests (`test_kokoro_provider.py`).
+- [x] P3.2.4 Real Smoke Tests (`test_kokoro_tts.py`).
+- [x] P3.2.5 Documentation (ADR-0015).
 
 ## Definition of done
 

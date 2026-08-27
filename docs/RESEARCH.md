@@ -60,3 +60,17 @@ MAYA intentionally implements, approximates, or omits specific mechanisms from t
 ## Research discipline
 
 Do not write claims such as "MAYA has emotions" or "MAYA has a human psyche." Write "MAYA maintains an affective state model" or "MAYA simulates emotion-aware behavior."
+
+### Text-to-Speech (TTS) Performance Optimization
+- **Goal:** CPU-only, low-RAM, near real-time voice synthesis.
+- **Model Assessed:** Kokoro TTS (82M parameters, ONNX).
+- **Environment:** Intel i5 11th Gen CPU, 8GB RAM, Ubuntu 24.04.
+- **Library:** `kokoro-onnx` (provides native Python ONNX runtime wrappers for Kokoro).
+- **Capabilities & Limits:**
+  - **Latency (TTFA):** Near instantaneous given sentence-level semantic buffering.
+  - **RAM Usage:** ~200MB - 300MB loaded.
+  - **Streaming:** True sub-word neural streaming is not supported natively in the ONNX wrapper, but segment-level/phrase chunking achieves similar application-level TTFA.
+  - **Expressive Controls:** 
+    - *Rate Control:* Supported natively via `speed` parameter.
+    - *Pitch/Volume/Emotion Tags/SSML:* Not directly supported by the ONNX wrapper. Emotion is effectively "baked in" to the chosen voice profile (e.g., `af_sarah`).
+- **Conclusion:** Best option for ultra-lightweight CPU execution. Capability downgrade patterns (like `TTSAdapterLayer`) are strictly necessary to translate rich conversational intents (like pitch shift or sadness) into Kokoro-compatible neutral formats without errors.
