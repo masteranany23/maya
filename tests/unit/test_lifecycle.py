@@ -2,24 +2,21 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from uuid import uuid4
 
-import pytest
-
+from maya.memory.lifecycle.consolidation import SimpleConsolidationEngine
+from maya.memory.lifecycle.contradiction import HeuristicContradictionDetector
+from maya.memory.lifecycle.decay import ExponentialDecayFunction, StepDecayFunction
+from maya.memory.lifecycle.importance import HeuristicImportanceScorer
+from maya.memory.lifecycle.reflection import StubReflectionEngine
 from maya.memory.models import (
     EmotionalContext,
     MemoryItem,
     MemoryType,
     ProvenanceRecord,
     ScoringState,
-    TemporalContext,
 )
-from maya.memory.lifecycle.decay import ExponentialDecayFunction, StepDecayFunction
-from maya.memory.lifecycle.importance import HeuristicImportanceScorer
-from maya.memory.lifecycle.contradiction import HeuristicContradictionDetector
-from maya.memory.lifecycle.consolidation import SimpleConsolidationEngine
-from maya.memory.lifecycle.reflection import StubReflectionEngine
 
 
 def _prov() -> ProvenanceRecord:
@@ -46,11 +43,11 @@ class TestExponentialDecay:
     def test_no_access_returns_base(self) -> None:
         fn = ExponentialDecayFunction()
         s = ScoringState(importance=0.7)
-        assert fn.compute_salience(s, datetime.now(timezone.utc)) == 0.7
+        assert fn.compute_salience(s, datetime.now(UTC)) == 0.7
 
     def test_decays_over_time(self) -> None:
         fn = ExponentialDecayFunction()
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         s = ScoringState(importance=1.0, decay_rate=0.1, last_accessed_at=now - timedelta(days=10))
         salience = fn.compute_salience(s, now)
         assert 0.3 < salience < 0.4  # exp(-1.0) ≈ 0.368
@@ -59,13 +56,13 @@ class TestExponentialDecay:
 class TestStepDecay:
     def test_within_threshold(self) -> None:
         fn = StepDecayFunction(max_age_days=30.0)
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         s = ScoringState(importance=0.8, last_accessed_at=now - timedelta(days=10))
         assert fn.compute_salience(s, now) == 0.8
 
     def test_beyond_threshold(self) -> None:
         fn = StepDecayFunction(max_age_days=30.0)
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         s = ScoringState(importance=0.8, last_accessed_at=now - timedelta(days=31))
         assert fn.compute_salience(s, now) == 0.0
 

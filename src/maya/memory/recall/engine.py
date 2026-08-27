@@ -13,6 +13,7 @@ from __future__ import annotations
 from collections import defaultdict
 from enum import StrEnum
 from uuid import UUID
+from typing import Any
 
 from maya.memory.models import MemoryItem, RecallCue, RecallResult
 from maya.memory.protocols import ActivationEngine
@@ -231,6 +232,7 @@ class MultiChannelRecallEngine:
 
 from typing import Protocol, runtime_checkable
 
+
 @runtime_checkable
 class _Channel(Protocol):
     @property
@@ -246,8 +248,8 @@ class _Reader(Protocol):
         self,
         user_id: UUID,
         *,
-        types: list | None = None,
-        statuses: list | None = None,
+        types: list[Any] | None = None,
+        statuses: list[Any] | None = None,
     ) -> list[MemoryItem]: ...
 
     async def get_batch(self, item_ids: list[UUID]) -> list[MemoryItem]: ...

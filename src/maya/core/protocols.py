@@ -1,21 +1,14 @@
 from __future__ import annotations
 
-from typing import Protocol
+from typing import Protocol, Any
 
 from maya.core.models import (
     AffectState,
     ConversationTurn,
-    MemoryItem,
     Persona,
     ResponsePlan,
     UserProfile,
 )
-
-
-class MemoryStore(Protocol):
-    async def add(self, item: MemoryItem) -> MemoryItem: ...
-
-    async def search(self, user_id: str, query: str, limit: int = 8) -> list[MemoryItem]: ...
 
 
 class PersonaStore(Protocol):
@@ -34,7 +27,7 @@ class LLMProvider(Protocol):
         *,
         persona: Persona,
         profile: UserProfile,
-        memories: list[MemoryItem],
+        memories: list[Any], # Actually list[MemoryItem] from maya.memory.models
         affect: AffectState,
         plan: ResponsePlan,
         user_message: str,

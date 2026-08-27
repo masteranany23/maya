@@ -14,6 +14,7 @@ from typing import Any, Protocol, runtime_checkable
 from uuid import UUID
 
 from maya.memory.models import (
+    ActivationTrace,
     AssociationType,
     ConsolidationResult,
     ContradictionRecord,
@@ -23,12 +24,10 @@ from maya.memory.models import (
     MemoryType,
     RecallCue,
     RecallResult,
-    ActivationTrace,
     ReflectionResult,
     ScoringState,
     WorkingMemory,
 )
-
 
 # ---------------------------------------------------------------------------
 # Storage protocols (persistence-agnostic)

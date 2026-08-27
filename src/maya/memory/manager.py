@@ -6,8 +6,8 @@ This is the high-level facade used by ConversationEngine.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
-from uuid import UUID, uuid4
+from datetime import datetime
+from uuid import UUID
 
 from maya.memory.models import (
     MemoryItem,

@@ -1,34 +1,16 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
-from enum import StrEnum
-from typing import Any
+from datetime import UTC, datetime
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
 
 
 def utc_now() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
-class MemoryType(StrEnum):
-    EPISODIC = "episodic"
-    SEMANTIC = "semantic"
-    PROFILE = "profile"
-    REFLECTIVE = "reflective"
 
-
-class MemoryItem(BaseModel):
-    id: UUID = Field(default_factory=uuid4)
-    memory_type: MemoryType
-    content: str
-    created_at: datetime = Field(default_factory=utc_now)
-    source: str
-    confidence: float = Field(default=0.5, ge=0.0, le=1.0)
-    importance: float = Field(default=0.5, ge=0.0, le=1.0)
-    tags: list[str] = Field(default_factory=list)
-    metadata: dict[str, Any] = Field(default_factory=dict)
 
 
 class AffectState(BaseModel):

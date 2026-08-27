@@ -6,7 +6,6 @@ See docs/DECISIONS.md ADR-0008.
 
 from __future__ import annotations
 
-import math
 from datetime import datetime
 
 from maya.memory.models import ScoringState
@@ -19,7 +18,7 @@ class ExponentialDecayFunction:
     """
 
     def compute_salience(self, scoring: ScoringState, now: datetime) -> float:
-        return scoring.effective_salience(now)
+        return float(scoring.effective_salience(now))
 
 
 class StepDecayFunction:
@@ -36,4 +35,4 @@ class StepDecayFunction:
         if scoring.last_accessed_at is None:
             return base
         elapsed_days = (now - scoring.last_accessed_at).total_seconds() / 86400.0
-        return base if elapsed_days <= self._max_age_days else 0.0
+        return float(base if elapsed_days <= self._max_age_days else 0.0)

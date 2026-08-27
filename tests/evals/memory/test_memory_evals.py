@@ -10,32 +10,28 @@ retrieval behavior end-to-end through the recall engine.
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from uuid import uuid4
 
-import pytest
-
+from maya.memory.lifecycle.consolidation import SimpleConsolidationEngine
+from maya.memory.lifecycle.contradiction import HeuristicContradictionDetector
 from maya.memory.models import (
-    AssociationType,
     EmotionalContext,
     MemoryItem,
-    MemoryLink,
     MemoryType,
     ProvenanceRecord,
     RecallCue,
     ScoringState,
     TemporalContext,
 )
+from maya.memory.recall.emotional import EmotionalRecallChannel
+from maya.memory.recall.engine import FusionStrategy, MultiChannelRecallEngine
+from maya.memory.recall.entity import EntityRecallChannel
+from maya.memory.recall.importance import ImportanceRecallChannel
 from maya.memory.recall.keyword import KeywordRecallChannel
 from maya.memory.recall.temporal import TemporalRecallChannel
-from maya.memory.recall.entity import EntityRecallChannel
 from maya.memory.recall.topic import TopicRecallChannel
-from maya.memory.recall.emotional import EmotionalRecallChannel
-from maya.memory.recall.importance import ImportanceRecallChannel
-from maya.memory.recall.engine import MultiChannelRecallEngine, FusionStrategy
-from maya.memory.store.in_memory import InMemoryWriter, InMemoryReader, InMemoryLinkStore
-from maya.memory.lifecycle.contradiction import HeuristicContradictionDetector
-from maya.memory.lifecycle.consolidation import SimpleConsolidationEngine
+from maya.memory.store.in_memory import InMemoryReader, InMemoryWriter
 
 
 def _prov(**kw) -> ProvenanceRecord:
@@ -45,7 +41,7 @@ def _prov(**kw) -> ProvenanceRecord:
 
 
 UID = uuid4()
-NOW = datetime.now(timezone.utc)
+NOW = datetime.now(UTC)
 
 
 # ---------------------------------------------------------------------------

@@ -9,7 +9,6 @@ from maya.llm.mock import MockLLMProvider
 from maya.memory.in_memory import InMemoryStore
 from maya.persona.in_memory import InMemoryPersonaStore
 
-
 app = FastAPI(title="MAYA", version="0.1.0")
 
 _memory = InMemoryStore()

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from maya.core.models import AffectState, MemoryItem, Persona, ResponsePlan, UserProfile
+from maya.core.models import AffectState, Persona, ResponsePlan, UserProfile
+from maya.memory.models import MemoryItem
 
 
 class MockLLMProvider:

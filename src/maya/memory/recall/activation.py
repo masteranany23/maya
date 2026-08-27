@@ -11,11 +11,10 @@ from __future__ import annotations
 
 import heapq
 import math
-from typing import Callable, Awaitable
+from collections.abc import Awaitable, Callable
 from uuid import UUID
 
-from maya.memory.models import MemoryLink, ActivationTrace
-
+from maya.memory.models import ActivationTrace, MemoryLink
 
 # Type alias for link fetcher to avoid circular imports
 _LinkGetter = Callable[[UUID], Awaitable[list[MemoryLink]]]
@@ -77,10 +76,9 @@ class SpreadingActivationEngine:
             links.sort(key=lambda lnk: lnk.strength, reverse=True)
             links = links[:self._fan_out_limit]
 
-            # Degree-normalized inhibition
             degree = len(links)
-            # e.g. degree 1 -> div by 1.0. degree 10 -> div by 2.4. degree 20 -> div by 3.0
-            inhibition_factor = math.log1p(degree - 1) + 1.0 if degree > 0 else 1.0
+            # e.g. degree 1 or 2 -> div by 1.0. degree 10 -> div by 2.0+
+            inhibition_factor = math.log1p(max(0, degree - 2)) + 1.0
 
             for link in links:
                 neighbor_id = link.target_id if link.source_id == current_id else link.source_id

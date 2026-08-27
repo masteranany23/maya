@@ -6,10 +6,8 @@ and indirect autobiographical recall.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from uuid import uuid4
-
-import pytest
 
 from maya.memory.models import (
     AssociationType,
@@ -20,9 +18,9 @@ from maya.memory.models import (
     RecallCue,
 )
 from maya.memory.recall.activation import SpreadingActivationEngine
-from maya.memory.recall.keyword import KeywordRecallChannel
 from maya.memory.recall.engine import MultiChannelRecallEngine
-from maya.memory.store.in_memory import InMemoryWriter, InMemoryReader, InMemoryLinkStore
+from maya.memory.recall.keyword import KeywordRecallChannel
+from maya.memory.store.in_memory import InMemoryLinkStore, InMemoryReader, InMemoryWriter
 
 
 def _prov() -> ProvenanceRecord:
@@ -30,7 +28,7 @@ def _prov() -> ProvenanceRecord:
 
 
 UID = uuid4()
-NOW = datetime.now(timezone.utc)
+NOW = datetime.now(UTC)
 
 
 class TestSpreadingActivation:

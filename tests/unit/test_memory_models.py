@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import math
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from uuid import uuid4
 
 import pytest
@@ -25,7 +25,6 @@ from maya.memory.models import (
     TemporalContext,
     WorkingMemory,
 )
-
 
 # ---------------------------------------------------------------------------
 # Enum tests
@@ -135,18 +134,18 @@ class TestScoringState:
 
     def test_effective_salience_never_accessed(self) -> None:
         s = ScoringState(importance=0.8)
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         # No last_accessed_at → returns base importance
         assert s.effective_salience(now) == 0.8
 
     def test_effective_salience_recent_access(self) -> None:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         s = ScoringState(importance=0.8, last_accessed_at=now)
         # Zero elapsed → base importance
         assert s.effective_salience(now) == 0.8
 
     def test_effective_salience_decays_over_time(self) -> None:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         ten_days_ago = now - timedelta(days=10)
         s = ScoringState(importance=1.0, decay_rate=0.1, last_accessed_at=ten_days_ago)
         salience = s.effective_salience(now)
@@ -154,12 +153,12 @@ class TestScoringState:
         assert abs(salience - expected) < 0.001
 
     def test_reinforcement_bonus_increases_salience(self) -> None:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         s = ScoringState(importance=0.5, reinforcement_bonus=0.3, last_accessed_at=now)
         assert s.effective_salience(now) == 0.8
 
     def test_salience_capped_at_one(self) -> None:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         s = ScoringState(importance=0.9, reinforcement_bonus=0.5, last_accessed_at=now)
         assert s.effective_salience(now) == 1.0
 
@@ -263,7 +262,7 @@ class TestRecallCue:
         assert cue.memory_types is None
 
     def test_full(self) -> None:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         cue = RecallCue(
             user_id=uuid4(),
             text_query="birthday",

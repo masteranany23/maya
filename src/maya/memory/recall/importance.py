@@ -6,7 +6,7 @@ This channel surfaces high-importance memories regardless of textual relevance.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from maya.memory.models import MemoryItem, RecallCue, RecallResult
 
@@ -24,7 +24,7 @@ class ImportanceRecallChannel:
     async def recall(
         self, cue: RecallCue, candidates: list[MemoryItem]
     ) -> list[RecallResult]:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         results: list[RecallResult] = []
 
         for item in candidates:

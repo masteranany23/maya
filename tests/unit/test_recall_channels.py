@@ -2,28 +2,24 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from uuid import UUID, uuid4
 
-import pytest
-
 from maya.memory.models import (
-    AssociationType,
     EmotionalContext,
     MemoryItem,
-    MemoryLink,
     MemoryType,
     ProvenanceRecord,
     RecallCue,
     ScoringState,
     TemporalContext,
 )
+from maya.memory.recall.emotional import EmotionalRecallChannel
+from maya.memory.recall.entity import EntityRecallChannel
+from maya.memory.recall.importance import ImportanceRecallChannel
 from maya.memory.recall.keyword import KeywordRecallChannel
 from maya.memory.recall.temporal import TemporalRecallChannel
-from maya.memory.recall.entity import EntityRecallChannel
 from maya.memory.recall.topic import TopicRecallChannel
-from maya.memory.recall.emotional import EmotionalRecallChannel
-from maya.memory.recall.importance import ImportanceRecallChannel
 
 
 def _prov() -> ProvenanceRecord:
@@ -95,7 +91,7 @@ class TestKeywordRecallChannel:
 class TestTemporalRecallChannel:
     async def test_recent_memory_scores_high(self) -> None:
         ch = TemporalRecallChannel()
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         m = _mem(temporal_context=TemporalContext(occurred_at=now))
         cue = RecallCue(user_id=UID)
         results = await ch.recall(cue, [m])
@@ -104,7 +100,7 @@ class TestTemporalRecallChannel:
 
     async def test_old_memory_scores_low(self) -> None:
         ch = TemporalRecallChannel(recency_half_life_days=7.0)
-        old = datetime.now(timezone.utc) - timedelta(days=30)
+        old = datetime.now(UTC) - timedelta(days=30)
         m = _mem(temporal_context=TemporalContext(occurred_at=old))
         cue = RecallCue(user_id=UID)
         results = await ch.recall(cue, [m])
@@ -113,7 +109,7 @@ class TestTemporalRecallChannel:
 
     async def test_time_range_filter(self) -> None:
         ch = TemporalRecallChannel()
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         inside = _mem(temporal_context=TemporalContext(occurred_at=now - timedelta(days=2)))
         outside = _mem(temporal_context=TemporalContext(occurred_at=now - timedelta(days=20)))
         cue = RecallCue(
@@ -212,7 +208,7 @@ class TestEmotionalRecallChannel:
 class TestImportanceRecallChannel:
     async def test_high_importance_surfaced(self) -> None:
         ch = ImportanceRecallChannel(min_salience=0.1)
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         m = _mem(scoring=ScoringState(importance=0.9, last_accessed_at=now))
         cue = RecallCue(user_id=UID)
         results = await ch.recall(cue, [m])
@@ -221,7 +217,7 @@ class TestImportanceRecallChannel:
 
     async def test_low_salience_filtered(self) -> None:
         ch = ImportanceRecallChannel(min_salience=0.5)
-        old = datetime.now(timezone.utc) - timedelta(days=100)
+        old = datetime.now(UTC) - timedelta(days=100)
         m = _mem(scoring=ScoringState(importance=0.3, decay_rate=0.1, last_accessed_at=old))
         cue = RecallCue(user_id=UID)
         results = await ch.recall(cue, [m])

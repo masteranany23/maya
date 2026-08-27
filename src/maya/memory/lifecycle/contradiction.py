@@ -10,7 +10,6 @@ import re
 
 from maya.memory.models import ContradictionRecord, MemoryItem, MemoryType
 
-
 # Patterns that indicate factual assertions (simple heuristic)
 _FACT_INDICATORS = re.compile(
     r"\b(i am|i'm|my .+ is|i have|i don't|i never|i always|i hate|i love)\b",

@@ -41,7 +41,7 @@ class HeuristicImportanceScorer:
         score += min(0.15, entity_count * 0.05)
 
         # Emotional intensity
-        arousal = context.get("arousal", 0.0)
+        arousal = float(context.get("arousal", 0.0))
         score += arousal * 0.15
 
         # High-signal keyword presence
@@ -49,4 +49,4 @@ class HeuristicImportanceScorer:
         keyword_hits = sum(1 for kw in self.HIGH_SIGNAL_KEYWORDS if kw in content_lower)
         score += min(0.15, keyword_hits * 0.05)
 
-        return min(1.0, max(0.0, score))
+        return float(min(1.0, max(0.0, score)))

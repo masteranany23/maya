@@ -7,7 +7,7 @@ filtering from RecallCue and recency-weighted scoring.
 from __future__ import annotations
 
 import math
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from maya.memory.models import MemoryItem, RecallCue, RecallResult
 
@@ -25,7 +25,7 @@ class TemporalRecallChannel:
     async def recall(
         self, cue: RecallCue, candidates: list[MemoryItem]
     ) -> list[RecallResult]:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         results: list[RecallResult] = []
 
         for item in candidates:

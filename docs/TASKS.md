@@ -22,9 +22,11 @@
 - [x] P1-M.8 Evaluation fixtures (8 scenarios: recall, temporal, emotional, associative, decay, contradiction, consolidation, provenance).
 - [x] P1-M.9 ADR-0006 through ADR-0010.
 - [x] P1-M.10 Architecture doc updates.
-- [ ] P1-M.11 Refactor ConversationEngine to use new MemoryManager (integration).
-- [ ] P1-M.12 Working memory management in conversation flow.
-- [ ] P1-M.13 Deprecate old MemoryStore protocol.
+- [x] P1-M.11 Refactor ConversationEngine to use new MemoryManager (integration).
+- [x] P1-M.12 Working memory management in conversation flow.
+- [x] P1-M.13 Deprecate old MemoryStore protocol.
+- [x] P1-M.14 Multi-channel cueing + Spreading activation (ADR-0011).
+- [x] P1-M.15 E2E Cognitive Integration and False-Memory Eval.
 
 ### P1 — Intelligence
 - [ ] P1.1 Add memory extraction as a structured LLM operation.

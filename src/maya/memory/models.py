@@ -9,7 +9,7 @@ See docs/DECISIONS.md ADR-0007, ADR-0008.
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from enum import StrEnum
 from typing import Any
 from uuid import UUID, uuid4
@@ -18,7 +18,7 @@ from pydantic import BaseModel, Field
 
 
 def _utc_now() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 # ---------------------------------------------------------------------------
