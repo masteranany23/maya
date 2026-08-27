@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Protocol, Any
+from typing import Any, Protocol
 
 from maya.core.models import (
     AffectState,
@@ -32,3 +32,12 @@ class LLMProvider(Protocol):
         plan: ResponsePlan,
         user_message: str,
     ) -> str: ...
+
+    async def generate_structured(
+        self,
+        *,
+        system_prompt: str,
+        user_prompt: str,
+        schema: type[Any], # Should be type[BaseModel]
+    ) -> Any: ...
+

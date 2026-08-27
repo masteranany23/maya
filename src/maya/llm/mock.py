@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+from typing import Any
+
 from maya.core.models import AffectState, Persona, ResponsePlan, UserProfile
 from maya.memory.models import MemoryItem
 
 
 class MockLLMProvider:
+    def __init__(self, structured_responses: dict[type[Any], Any] = None):
+        self.structured_responses = structured_responses or {}
+
     async def generate(
         self,
         *,
@@ -19,3 +24,19 @@ class MockLLMProvider:
         salutation = f", {name}" if name else ""
         memory_hint = " I remember something relevant from our earlier conversation." if memories else ""
         return f"I hear you{salutation}.{memory_hint} You said: {user_message}"
+
+    async def generate_structured(
+        self,
+        *,
+        system_prompt: str,
+        user_prompt: str,
+        schema: type[Any],
+    ) -> Any:
+        if schema in self.structured_responses:
+            return self.structured_responses[schema]
+        
+        # Try to return a default-constructed schema if possible, or raise
+        try:
+            return schema()
+        except Exception:
+            raise ValueError(f"No mock response configured for schema {schema.__name__}")

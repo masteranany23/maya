@@ -29,9 +29,9 @@
 - [x] P1-M.15 E2E Cognitive Integration and False-Memory Eval.
 
 ### P1 — Intelligence
-- [ ] P1.1 Add memory extraction as a structured LLM operation.
-- [ ] P1.2 Add memory importance/relevance score (using HeuristicImportanceScorer).
-- [ ] P1.3 Add retrieval ranking abstraction (done via RecallEngine).
+- [x] P1.1 Add memory extraction as a structured LLM operation.
+- [x] P1.2 Add memory importance/relevance score (using HeuristicImportanceScorer).
+- [x] P1.3 Add retrieval ranking abstraction (done via RecallEngine).
 - [ ] P1.4 Add affect state model.
 - [ ] P1.5 Add response planning schema.
 - [ ] P1.6 Add response validation and hallucinated-memory guard.
@@ -39,10 +39,10 @@
 
 ### P2 — Long-term
 - [ ] P2.1 Add decay/reinforcement (decay functions implemented, sweep job pending).
-- [ ] P2.2 Add reflection engine (stub implemented, LLM-powered pending).
-- [ ] P2.3 Add semantic consolidation (simple engine implemented, LLM summarization pending).
-- [ ] P2.4 Add contradiction/overwrite rules (detector implemented, resolution policies pending).
-- [ ] P2.5 Add LoCoMo-style regression fixtures (8 evaluation fixtures implemented).
+- [x] P2.2 Add reflection engine (stub implemented, LLM-powered pending).
+- [x] P2.3 Add semantic consolidation (simple engine implemented, LLM summarization pending).
+- [x] P2.4 Add contradiction/overwrite rules (detector implemented, resolution policies pending).
+- [x] P2.5 Add LoCoMo-style regression fixtures (8 evaluation fixtures implemented).
 
 ## Definition of done
 

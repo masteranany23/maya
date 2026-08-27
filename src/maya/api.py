@@ -1,18 +1,19 @@
 from __future__ import annotations
 
 from typing import Any
+
 from fastapi import FastAPI  # type: ignore
-from maya.persona.in_memory import InMemoryPersonaStore
 
 from maya.conversation.engine import ConversationEngine
 from maya.core.models import ChatRequest, ChatResponse
 from maya.emotion.basic import KeywordAffectAnalyzer
 from maya.llm.mock import MockLLMProvider
-from maya.memory.store.in_memory import InMemoryWriter, InMemoryReader, InMemoryLinkStore
+from maya.memory.manager import DefaultMemoryManager
 from maya.memory.recall.activation import SpreadingActivationEngine
 from maya.memory.recall.engine import MultiChannelRecallEngine
 from maya.memory.recall.keyword import KeywordRecallChannel
-from maya.memory.manager import DefaultMemoryManager
+from maya.memory.store.in_memory import InMemoryLinkStore, InMemoryReader, InMemoryWriter
+from maya.persona.in_memory import InMemoryPersonaStore
 
 app = FastAPI(title="MAYA", version="0.1.0")
 
@@ -22,7 +23,9 @@ _reader = InMemoryReader(_storage)
 _link_store = InMemoryLinkStore()
 
 from uuid import UUID
+
 from maya.memory.models import MemoryLink
+
 
 async def _get_links(mid: UUID) -> list[MemoryLink]:
     return await _link_store.get_links(mid, direction="both")

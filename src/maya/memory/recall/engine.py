@@ -12,8 +12,8 @@ from __future__ import annotations
 
 from collections import defaultdict
 from enum import StrEnum
-from uuid import UUID
 from typing import Any
+from uuid import UUID
 
 from maya.memory.models import MemoryItem, RecallCue, RecallResult
 from maya.memory.protocols import ActivationEngine

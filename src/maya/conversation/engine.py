@@ -9,6 +9,8 @@ from maya.core.models import (
     ResponsePlan,
 )
 from maya.core.protocols import AffectAnalyzer, LLMProvider, PersonaStore
+from maya.memory.association import AssociationEngine
+from maya.memory.extraction import LLMMemoryEncoder, MemoryEncoder
 from maya.memory.manager import DefaultMemoryManager
 from maya.memory.models import MemoryItem, MemoryType, ProvenanceRecord, RecallCue
 
@@ -21,11 +23,16 @@ class ConversationEngine:
         persona_store: PersonaStore,
         affect_analyzer: AffectAnalyzer,
         llm: LLMProvider,
+        memory_encoder: MemoryEncoder | None = None,
+        association_engine: AssociationEngine | None = None,
     ) -> None:
         self.memory_manager = memory_manager
         self.persona_store = persona_store
         self.affect_analyzer = affect_analyzer
         self.llm = llm
+        
+        self.memory_encoder = memory_encoder or LLMMemoryEncoder(llm=llm)
+        self.association_engine = association_engine
 
     async def chat(
         self, *, user_id: UUID, conversation_id: UUID, message: str
@@ -83,15 +90,26 @@ class ConversationEngine:
         )
 
         # 10/11. Encode and memorize experience
-        experience = MemoryItem(
-            user_id=user_id,
-            memory_type=MemoryType.EPISODIC,
-            content=message,
-            provenance=ProvenanceRecord(source_type="user_message", method="direct_observation"),
-        )
-        await self.memory_manager.memorize(experience)
+        encoded_experience = await self.memory_encoder.encode(turn)
+        if not encoded_experience:
+            # Fallback if encoding fails
+            encoded_experience = MemoryItem(
+                user_id=user_id,
+                memory_type=MemoryType.EPISODIC,
+                content=message,
+                provenance=ProvenanceRecord(source_type="user_message", method="direct_observation"),
+            )
+        
+        memorized_item = await self.memory_manager.memorize(encoded_experience)
 
-        # 12. Update WorkingMemory (optional - e.g. add the bot's response to recent turns, 
+        # 12. Association formation (P1.3)
+        if self.association_engine:
+            await self.association_engine.associate(
+                new_memory=memorized_item, 
+                context_memories=working_memory.active_memories
+            )
+
+        # 13. Update WorkingMemory (optional - e.g. add the bot's response to recent turns, 
         # but right now we only store user turns. Let's add bot turn if needed, or just return)
 
         return ChatResponse(
