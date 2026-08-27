@@ -62,7 +62,7 @@ class ConversationEngine:
         recall_results = await self.memory_manager.remember(cue)
 
         # 7. Add selected memories to WorkingMemory
-        working_memory.active_memories = [r.memory for r in recall_results]
+        working_memory.recall_results = recall_results
 
         # 8. Response planning
         plan = ResponsePlan(
@@ -73,7 +73,7 @@ class ConversationEngine:
         )
 
         # If no supporting memory, validate our confidence
-        if not working_memory.active_memories:
+        if not working_memory.recall_results:
             plan.goals.append("acknowledge lack of prior context")
 
         # 9. LLM generation
@@ -83,7 +83,7 @@ class ConversationEngine:
         text = await self.llm.generate(
             persona=persona,
             profile=profile,
-            memories=working_memory.active_memories,
+            recall_results=working_memory.recall_results,
             affect=affect,
             plan=plan,
             user_message=message,

@@ -99,7 +99,8 @@ class MultiChannelRecallEngine:
         if missing_ids:
             fetched = await self._reader.get_batch(missing_ids)
             for m in fetched:
-                memory_map[m.id] = m
+                if m.user_id == cue.user_id:
+                    memory_map[m.id] = m
 
         for uid in all_ids:
             if uid in cue.exclude_ids:

@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Any
 
 from maya.core.models import AffectState, Persona, ResponsePlan, UserProfile
-from maya.memory.models import MemoryItem
 
 
 class MockLLMProvider:
@@ -15,14 +14,14 @@ class MockLLMProvider:
         *,
         persona: Persona,
         profile: UserProfile,
-        memories: list[MemoryItem],
+        recall_results: list[Any],
         affect: AffectState,
         plan: ResponsePlan,
         user_message: str,
     ) -> str:
         name = profile.preferred_name
         salutation = f", {name}" if name else ""
-        memory_hint = " I remember something relevant from our earlier conversation." if memories else ""
+        memory_hint = " I remember something relevant from our earlier conversation." if recall_results else ""
         return f"I hear you{salutation}.{memory_hint} You said: {user_message}"
 
     async def generate_structured(

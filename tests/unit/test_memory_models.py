@@ -296,7 +296,7 @@ class TestWorkingMemory:
         wm = WorkingMemory(
             user_id=uuid4(),
             conversation_id=uuid4(),
-            active_memories=[_make_memory() for _ in range(12)],
+            recall_results=[RecallResult(memory=_make_memory(), relevance_score=1.0) for _ in range(12)],
             capacity=12,
         )
         assert wm.is_at_capacity()

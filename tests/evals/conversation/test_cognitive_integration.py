@@ -35,14 +35,14 @@ class StubLLMProvider:
         *,
         persona: Persona,
         profile: UserProfile,
-        memories: list[MemoryItem],
+        recall_results: list[Any],
         affect: AffectState,
         plan: ResponsePlan,
         user_message: str,
     ) -> str:
-        if not memories:
+        if not recall_results:
             return "I have no specific memories about this."
-        return f"Response based on {len(memories)} memories."
+        return f"Response based on {len(recall_results)} memories."
 
 
 def _setup_engine() -> tuple[ConversationEngine, dict, InMemoryLinkStore]:

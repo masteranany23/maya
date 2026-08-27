@@ -152,10 +152,21 @@ class AssociationEngine:
             links = await strategy.form_links(new_memory, context_memories)
             all_links.extend(links)
             
-        # Deduplicate links? (Optional depending on strategy overlap, currently we persist all)
-        # Store links
+        # Deduplicate links
+        existing_links = await self.link_store.get_links(new_memory.id, direction="both")
+        existing_signatures = {
+            (l.source_id, l.target_id, l.link_type) for l in existing_links
+        }
+        
         stored_links = []
+        seen_signatures = set()
+        
         for link in all_links:
+            sig = (link.source_id, link.target_id, link.link_type)
+            if sig in existing_signatures or sig in seen_signatures:
+                continue
+            seen_signatures.add(sig)
+            
             stored = await self.link_store.add_link(link)
             stored_links.append(stored)
             

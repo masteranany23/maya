@@ -27,7 +27,7 @@ class LLMProvider(Protocol):
         *,
         persona: Persona,
         profile: UserProfile,
-        memories: list[Any], # Actually list[MemoryItem] from maya.memory.models
+        recall_results: list[Any], # list[RecallResult] from maya.memory.models
         affect: AffectState,
         plan: ResponsePlan,
         user_message: str,

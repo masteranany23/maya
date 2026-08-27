@@ -34,6 +34,12 @@ class DummyLinkStore:
         self.links.append(link)
         return link
 
+    async def get_links(self, memory_id, direction="both", link_types=None):
+        return [
+            l for l in self.links
+            if l.source_id == memory_id or l.target_id == memory_id
+        ]
+
 @pytest.mark.asyncio
 async def test_structured_extraction_and_provenance():
     # Setup mock LLM response

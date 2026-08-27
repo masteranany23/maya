@@ -235,14 +235,18 @@ class WorkingMemory(BaseModel):
     user_id: UUID
     conversation_id: UUID
     recent_turns: list[Any] = Field(default_factory=list)  # ConversationTurn refs
-    active_memories: list[MemoryItem] = Field(default_factory=list)
+    recall_results: list[RecallResult] = Field(default_factory=list)
     active_topics: list[str] = Field(default_factory=list)
     active_entities: list[str] = Field(default_factory=list)
     current_affect: dict[str, Any] = Field(default_factory=dict)
     capacity: int = Field(default=12, ge=1)
+    
+    @property
+    def active_memories(self) -> list[MemoryItem]:
+        return [r.memory for r in self.recall_results]
 
     def is_at_capacity(self) -> bool:
-        return len(self.active_memories) >= self.capacity
+        return len(self.recall_results) >= self.capacity
 
 
 # ---------------------------------------------------------------------------
