@@ -13,7 +13,7 @@ async def download_file(url: str, dest: Path) -> None:
         return
         
     print(f"Downloading {url} to {dest}...")
-    async with httpx.AsyncClient(follow_redirects=True) as client:
+    async with httpx.AsyncClient(follow_redirects=True, timeout=None) as client:
         async with client.stream("GET", url) as response:
             response.raise_for_status()
             with open(dest, "wb") as f:
