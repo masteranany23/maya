@@ -74,3 +74,8 @@ Reason: Directly pipelining LLM token chunks to a TTS adapter leads to robotic, 
 Status: Accepted
 
 Reason: We require a fully local, CPU-compatible TTS provider optimized for an Intel i5 / 8GB RAM environment. The 82M parameter Kokoro model executed via ONNX (`kokoro-onnx`) uses <300MB RAM and achieves near real-time synthesis. Since it lacks deep expressive parameter controls (like explicit pitch shifting), we leverage the `TTSAdapterLayer` (ADR-0014) to degrade MAYA's rich `SpeechPlan` into Kokoro's supported features (rate control). Models are explicitly excluded from version control and downloaded securely out-of-band.
+
+## ADR-0016 — Real-Time Voice Runtime & Perception Architecture
+Status: Accepted
+
+Reason: The original P3.2 voice pipeline was purely serial and blocked on STT. To achieve low-latency, real-time conversational interaction, we introduced `AudioFrame` and `TranscriptEvent` domain models. An `AudioRouter` broadcasts a single incoming microphone stream to multiple concurrent listeners without generator contention, enabling background VAD monitoring. The `VoiceSession` state machine manages `IDLE/LISTENING/THINKING/SPEAKING/INTERRUPTED` states, allowing `VADEventType.SPEECH_STARTED` to aggressively barge-in and cancel ongoing generation/synthesis if the system is speaking or thinking.

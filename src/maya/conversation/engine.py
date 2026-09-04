@@ -194,23 +194,28 @@ class ConversationEngine:
         )
 
         full_response = ""
-        async for chunk in response_stream:
+        try:
+            async for chunk in response_stream:
+                if cancel_event.is_set():
+                    # Barge-in during bot response!
+                    turn.interrupted = True
+                    break
+                full_response += chunk
+                yield chunk
+        finally:
             if cancel_event.is_set():
-                # Barge-in during bot response!
-                break
-            full_response += chunk
-            yield chunk
+                turn.interrupted = True
 
-        # Memorize user's turn
-        encoded_experience = await self.memory_encoder.encode(turn) if self.memory_encoder else None
-        if not encoded_experience:
-            encoded_experience = MemoryItem(
-                user_id=user_id,
-                memory_type=MemoryType.EPISODIC,
-                content=full_message,
-                provenance=ProvenanceRecord(source_type="user_message", method="direct_observation"),
-            )
-        memorized_item = await self.memory_manager.memorize(encoded_experience)
+            # Memorize user's turn
+            encoded_experience = await self.memory_encoder.encode(turn) if self.memory_encoder else None
+            if not encoded_experience:
+                encoded_experience = MemoryItem(
+                    user_id=user_id,
+                    memory_type=MemoryType.EPISODIC,
+                    content=full_message,
+                    provenance=ProvenanceRecord(source_type="user_message", method="direct_observation"),
+                )
+            memorized_item = await self.memory_manager.memorize(encoded_experience)
 
         if self.association_engine:
             await self.association_engine.associate(

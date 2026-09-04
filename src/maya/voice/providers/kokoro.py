@@ -7,7 +7,7 @@ from typing import AsyncGenerator
 import numpy as np
 import soundfile as sf
 
-from maya.voice.models import AudioChunk, SpeechPlan, TTSCapabilities
+from maya.voice.models import AudioFrame, SpeechPlan, TTSCapabilities
 from maya.voice.protocols import TTSProvider
 
 
@@ -47,7 +47,7 @@ class KokoroTTSProvider(TTSProvider):
             from kokoro_onnx import Kokoro
             self._kokoro = Kokoro(self._model_path, self._voices_path)
             
-    async def synthesize(self, plan: SpeechPlan) -> AsyncGenerator[AudioChunk, None]:
+    async def synthesize(self, plan: SpeechPlan) -> AsyncGenerator[AudioFrame, None]:
         await asyncio.to_thread(self._ensure_loaded)
         
         for i, segment in enumerate(plan.segments):
@@ -69,7 +69,7 @@ class KokoroTTSProvider(TTSProvider):
             sf.write(buffer, samples, sample_rate, format='wav')
             wav_bytes = buffer.getvalue()
             
-            yield AudioChunk(data=wav_bytes, format="wav", is_final=is_final)
+            yield AudioFrame(pcm_data=wav_bytes, sample_rate=sample_rate, is_final=is_final)
             
             # Yield control back to the event loop so interruption checks can run
             await asyncio.sleep(0)

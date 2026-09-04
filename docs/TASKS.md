@@ -61,6 +61,14 @@
 - [x] P3.2.4 Real Smoke Tests (`test_kokoro_tts.py`).
 - [x] P3.2.5 Documentation (ADR-0015).
 
+### P3.3 — Real-Time Voice Perception & Runtime
+- [x] P3.3.1 Domain Model Refinement (`AudioFrame`, `TranscriptEvent`, `VoiceSessionState`).
+- [x] P3.3.2 Protocol Upgrade (`VADProvider`, `STTProvider`, `TTSProvider` use `AudioFrame`).
+- [x] P3.3.3 Implement `AudioRouter` for stream fan-out.
+- [x] P3.3.4 Update `VoiceSession` state machine and interruption handling.
+- [x] P3.3.5 Fix Providers & Tests (`mock.py`, `kokoro.py`, test files).
+- [x] P3.3.6 Documentation (ADR-0016).
+
 ## Definition of done
 
 Each task includes tests and documentation updates. The code remains runnable. Interfaces are dependency-injected. No secret or vendor-specific implementation leaks into domain code.

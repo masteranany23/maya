@@ -42,9 +42,11 @@ def engine(memory_manager):
         llm=MockLLMProvider(),
     )
 
+from maya.voice.models import AudioFrame
+
 async def mock_audio_stream():
-    yield b"hello"
-    yield b" there"
+    yield AudioFrame(pcm_data=b"hello")
+    yield AudioFrame(pcm_data=b" there")
 
 @pytest.mark.asyncio
 async def test_voice_session_full_duplex(engine):
@@ -68,5 +70,5 @@ async def test_voice_session_full_duplex(engine):
     # The MockTTS yields the text of the segments as bytes.
     # The LLM mock will output "I have no specific memories about this."
     # The SemanticBuffer will split it into sentences.
-    text_output = b"".join([c.data for c in chunks if not c.is_final])
+    text_output = b"".join([c.pcm_data for c in chunks if not c.is_final])
     assert b"I have no specific memories about this" in text_output

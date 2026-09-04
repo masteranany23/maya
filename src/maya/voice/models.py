@@ -36,13 +36,51 @@ class TTSCapabilities(BaseModel):
     supported_audio_formats: list[str] = Field(default_factory=lambda: ["wav"])
 
 
-class VADEvent(str, Enum):
+class VADEventType(str, Enum):
     SPEECH_STARTED = "speech_started"
     SPEECH_ENDED = "speech_ended"
+    INTERMEDIATE = "intermediate"
 
 
-class AudioChunk(BaseModel):
-    """Wrapper for raw audio bytes."""
-    data: bytes
-    format: str = "wav"
+class VADEvent(BaseModel):
+    """Voice Activity Detection event with rich metadata."""
+    type: VADEventType
+    timestamp: float = 0.0
+    confidence: float = 1.0
+
+
+class TranscriptEvent(BaseModel):
+    """Speech-to-Text transcription event."""
+    text: str
+    is_final: bool
+    confidence: float = 1.0
+    timestamp: float = 0.0
+
+
+class AudioFrame(BaseModel):
+    """Provider-neutral wrapper for raw audio streams."""
+    pcm_data: bytes
+    sample_rate: int = 24000
+    channels: int = 1
+    timestamp: float = 0.0
+    seq: int = 0
+    duration: float = 0.0
+    metadata: dict[str, str] = Field(default_factory=dict)
     is_final: bool = False
+
+
+class VoiceSessionState(str, Enum):
+    """State machine states for VoiceSession."""
+    IDLE = "idle"
+    LISTENING = "listening"
+    THINKING = "thinking"
+    SPEAKING = "speaking"
+    INTERRUPTED = "interrupted"
+
+
+class CancellationReason(str, Enum):
+    """Explicit semantic reasons for cancelling an ongoing process."""
+    BARGE_IN = "barge_in"
+    USER_HANGUP = "user_hangup"
+    TIMEOUT = "timeout"
+    SYSTEM_ERROR = "system_error"

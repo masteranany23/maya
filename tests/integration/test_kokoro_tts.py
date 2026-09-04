@@ -37,8 +37,7 @@ async def test_kokoro_smoke_test():
         
     total_time = time.time() - start_time
     assert len(chunks) == 2
-    assert chunks[0].format == "wav"
-    assert len(chunks[0].data) > 0
+    assert len(chunks[0].pcm_data) > 0
     assert chunks[1].is_final is True
     
     print(f"Total generation time: {total_time:.3f}s")
